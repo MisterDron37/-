@@ -1,0 +1,49 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Каталог оборудования{% endblock %}
+
+{% block content %}
+
+<h2>Каталог оборудования</h2>
+
+<form method="get">
+    <input
+        type="text"
+        name="search"
+        placeholder="Поиск оборудования..."
+        value="{{ request.GET.search }}"
+    >
+
+    <button type="submit">Найти</button>
+</form>
+
+<div class="equipment-list">
+
+    {% for item in equipment %}
+
+    <div class="equipment-card">
+
+        <h3>{{ item.name }}</h3>
+
+        <p>Категория: {{ item.category }}</p>
+
+        <p>Цена за день: {{ item.price_per_day }} руб.</p>
+
+        <p>Количество: {{ item.quantity }}</p>
+
+        <a href="{% url 'create_booking' item.id %}">
+            Забронировать
+        </a>
+
+    </div>
+
+    {% empty %}
+
+    <p>Оборудование не найдено.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
