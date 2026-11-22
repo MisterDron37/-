@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+
+<h2>Личный кабинет</h2>
+
+<h3>Мои бронирования</h3>
+
+{% for booking in bookings %}
+
+<div class="booking-card">
+
+    <h3>{{ booking.equiment.name }}</h3>
+
+    <p>Дана начала: {{ booking.start_date }}</p>
+
+    <p>Дана окончания: {{ booking.end_date }}</p>
+
+    <p>Стоимость: {{ booking.total_price }} руб.</p>
+
+    <p>Статус: {{ booking.get_status_display }}</p>
+
+</div>
+
+{% empty %}
+
+<p>У вас пока нет бронирований.</p>
+
+{% endfor %}
+
+{% endlock %}

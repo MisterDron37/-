@@ -1,10 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Панель менеджера{% endblock %}
+
+{% block content %}
+
+<h2>Панель менеджера</h2>
+
+<h3>Управление бронированиями</h3>
+
+{% for booking in bookings %}
+
+<div class="booking-card">
+
+    <h3>{{ booking.equipment.name }}</h3>
+
+    <p>Клиент: {{ booking.user.username }}</p>
+
+    <p>Дата начала: {{ booking.start_date }}</p>
+
+    <p>Дата окончания: {{ booking.end_date }}</p>
+
+    <p>Стоимость: {{ booking.total_price }} руб.</p>
+
+    <p>Статус: {{booking.get_status_display}}</p>
+
+    {% if booking.status == 'pending' %}
+
+    <form method="post" action="{% url 'confirm_booking' %}">
+        {% csrf_token %}
+        <button type="submit">
+            Подтвердить бронирование
+        </button>
+    </form>
+
+    {% elif booking.status == 'confirmed' %}
+
+    <form method="post" action="{% url 'issue_equipment' booking.id %}">
+        {% csrf_token %}
+        <button type="submit">
+            Выдать оборудование
+        </button>
+    </form>
+
+    {% elif booking.status == 'issued' %}
+
+    <form method="post" action="{% url 'return_equipment' booking,id %}">
+
+        {% csrf_token %}
+
+        <label>Состояние оборудования:</label>
+
+        <textarea name="condition" placeholder="Опишите состояние оборудования..." required> </textarea>
+
+        <button type="submit">
+            Принять возврат
+        </button>
+
+    </form>
+
+</div>
+
+{% empty %}
+
+<p>Активных бронирований пока нет.</p>
+
+{% endfor %}
+
+{% endlock %}

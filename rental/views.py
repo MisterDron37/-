@@ -5,22 +5,78 @@ from django.db.models import Sum
 from django.utils import timezone
 from datetime import date
 
-from .models import Equimpent, Booking, RentalRecord
+from .models import Equimpent, Booking, RentalRecord, Category
 from .forms import BookingForm
 
+def fill_catalog():
+    from .models import Category, Equimpent
+
+    photo, _ = Category.objects.get_or_create(
+        name='хоккейные коньки'
+    )
+
+    light, _ = Category.objects.get_or_create(
+        name='фигурные коньки'
+    )
+
+    products = [
+        {
+            'name': 'BAUER S26 X-LS 2.0 SKATE-SR',
+            'category': photo,
+            'description': 'Коньки',
+            'price_per_day': 12877,
+            'quantity': 3,
+            'condition': 'good',
+            'image': 'res/1.webp',
+        },
+        {
+            'name': 'Коньки хоккейные RUSH ACTION',
+            'category': photo,
+            'description': 'Коньки',
+            'price_per_day': 800,
+            'quantity': 2,
+            'condition': 'good',
+            'image': 'res/2.webp',
+        },
+        {
+            'name': 'Коньки фигурные RUSH ACTION',
+            'category': light,
+            'description': 'Коньки',
+            'price_per_day': 1000,
+            'quantity': 2,
+            'condition': 'good',
+            'image': 'res/3.webp',
+        },
+    ]
+
+    for product in products:
+        Equimpent.objects.update_or_create(
+            name=product['name'],
+            defaults=product
+        )
+
 def catalog(request):
+    fill_catalog()
+
+    from .models import Equimpent
+
     equipments = Equimpent.objects.filter(condition='good')
 
     search = request.GET.get('search', '')
     categories = request.GET.get('categories', '')
 
     if search:
-        equipments = Equimpent.filter(name__icontains=search)
+        equipments = equipments.filter(name__icontains=search)
 
     if categories:
-        equipments = Equimpent.filter(category_id= categories)
+        equipments = equipments.filter(category_id=categories)
 
-    return render(request, 'catalog.html', {'equipments': equipments})
+    print('COUNT:', equipments.count())
+
+    return render(request, 'catalog.html', {
+        'equipments': equipments,
+        'categories': Category.objects.all()
+    })
 
 @login_required
 def create_booking(request, equipment_id):
@@ -30,10 +86,10 @@ def create_booking(request, equipment_id):
         condition='good'
     )
     if request.method == 'POST':
-        form = BookingFrom(request.POST)
+        form = BookingForm(request.POST)
         if form.is_valid():
             start = form.cleaned_data['start_date']
-            end = From.cleaned_data['end_date']
+            end = form.cleaned_data['end_date']
             if start < date.today():
                 form.add_error(
                 'start_date',
@@ -42,7 +98,7 @@ def create_booking(request, equipment_id):
             else:
                 with transaction.atomic():
                     equipment = Equimpent.objects.select_for_update().get(id=equipment_id)
-                    overlapping = Booking.object.filter(
+                    overlapping = Booking.objects.filter(
                         equipment=equipment,
                         status__in=[
                             'pending', 'confirmed', 'issued'
@@ -65,7 +121,7 @@ def create_booking(request, equipment_id):
                         booking.save()
                         return redirect('profile')
     else:
-        form = BookingFrom()
+        form = BookingForm()
     return render(request, 'booking.html', {
         'form' : form,
         'equipment': equipment,

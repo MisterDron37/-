@@ -1,6 +1,8 @@
 
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Каталог оборудования{% endblock %}
 
 {% block content %}
@@ -20,9 +22,13 @@
 
 <div class="equipment-list">
 
-    {% for item in equipment %}
+    {% for item in equipments %}
 
     <div class="equipment-card">
+
+        {% if item.image %}
+            <img src="{% static item.image %}" alt="{{ item.name }}" class="equipment-photo">
+        {% endif %}
 
         <h3>{{ item.name }}</h3>
 
