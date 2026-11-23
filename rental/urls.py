@@ -2,17 +2,29 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.catalog, name='catalog'),
+    path(
+        '',
+        views.catalog,
+        name='catalog'
+    ),
 
     path(
         'booking/<int:booking_id>/',
         views.create_booking,
-        name = "booking"
+        name = "create_booking"
     ),
 
-    path('profile/', views.profile, name='profile'),
+    path(
+        'profile/',
+         views.profile,
+        name='profile'
+    ),
 
-    path('manager/', views.manager_panel, name='manager'),
+    path(
+        'manager/',
+        views.manager_panel,
+        name='manager'
+    ),
 
     path(
         'manager/confirm/<int:booking_id>/',
@@ -21,7 +33,7 @@ urlpatterns = [
     ),
 
     path(
-        'manager/issue/int:booking_id>/',
+        'manager/issue/<int:booking_id>/',
         views.issue_equipment,
         name = "issue_equipment"
     ),

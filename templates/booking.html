@@ -1,10 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'bace.html' %}
 
-</body>
-</html>
+{% block title %}Бронирование оборудования{% endblock %}
+
+{% block content %}
+
+<h2>Бронирование оборудования</h2>\
+
+<div class ="booking-card">
+
+    <h3>{{ equiment.name }}</h3>
+
+    <p>Категория: {{ equiment.category }}</p>
+
+    <p> Строимость за день:
+        {{ equiment.price_per_day }} руб.
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Подтвердить бронирование
+        </button>
+
+    </form>
+
+    <a href="{% url 'catalog' %}">
+        Вернутся в каталог
+    </a>
+
+</div>
+
+{% endblock %}
